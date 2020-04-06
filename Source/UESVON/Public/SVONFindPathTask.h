@@ -10,12 +10,12 @@
 class ASVONVolume;
 struct SVONPathFinderSettings;
 
-class FSVONFindPathTask : public FNonAbandonableTask
+class UESVON_API FSVONFindPathTask : public FNonAbandonableTask
 {
 	friend class FAutoDeleteAsyncTask<FSVONFindPathTask>;
 
 public:
-	FSVONFindPathTask(ASVONVolume& aVolume, SVONPathFinderSettings& aSettings,  UWorld* aWorld, const SVONLink aStart, const SVONLink aTarget, const FVector& aStartPos, const FVector& aTargetPos, FSVONNavPathSharedPtr* oPath, FThreadSafeBool& aCompleteFlag) :
+	FSVONFindPathTask(ASVONVolume& aVolume, SVONPathFinderSettings& aSettings,  UWorld* aWorld, const SVONLink aStart, const SVONLink aTarget, const FVector& aStartPos, const FVector& aTargetPos, FSVONNavPathSharedPtr oPath, FThreadSafeBool& aCompleteFlag) :
 		myVolume(aVolume),
 		myWorld(aWorld),
 		myStart(aStart),
@@ -35,7 +35,7 @@ protected:
 	SVONLink myTarget;
 	FVector myStartPos;
 	FVector myTargetPos;
-	FSVONNavPathSharedPtr* myPath;
+	FSVONNavPathSharedPtr myPath;
 
 	SVONPathFinderSettings mySettings;
 

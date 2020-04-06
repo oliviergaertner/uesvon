@@ -20,21 +20,22 @@ void FSVONNavigationPath::DebugDraw(UWorld* aWorld, const ASVONVolume& aVolume)
 	for (int i = 0; i < myPoints.Num(); i++)
 	{
 		FSVONPathPoint& point = myPoints[i];
-		
-		
+
+		FVector offSet(0.f);
+		//if (i == 0)
+			//offSet.Z -= 300.f;
+		float size = point.myLayer == 0 ? aVolume.GetVoxelSize(point.myLayer) * 0.25f : aVolume.GetVoxelSize(point.myLayer) * 0.5f;
+
+		DrawDebugBox(aWorld, point.myPosition, FVector(size), SVONStatics::myLinkColors[point.myLayer], true, -1.f, 0, 30.f);
+
+		DrawDebugSphere(aWorld, point.myPosition + offSet, 30.f, 20, FColor::Cyan, true, -1.f, 0, 100.f);
+
 		if (i < myPoints.Num() - 1)
 		{
-			FVector offSet(0.f);
-			//if (i == 0)
-				//offSet.Z -= 300.f;
-			float size = point.myLayer == 0 ? aVolume.GetVoxelSize(point.myLayer) * 0.25f : aVolume.GetVoxelSize(point.myLayer) * 0.5f;
-
-			DrawDebugBox(aWorld, point.myPosition, FVector(size), SVONStatics::myLinkColors[point.myLayer], true, -1.f, 0, 30.f);
-				
-			DrawDebugSphere(aWorld, point.myPosition + offSet, 30.f, 20, FColor::Cyan, true, -1.f, 0, 100.f);
-
-			//DrawDebugLine(aWorld, point.myPosition + offSet, myPoints[i+1].myPosition, FColor::Cyan, true, -1.f, 0, 100.f);
+			DrawDebugLine(aWorld, point.myPosition + offSet, myPoints[i + 1].myPosition, FColor::Cyan, true, -1.f, 0, 100.0f);
 		}
+
+
 	}
 }
 

@@ -136,7 +136,7 @@ bool USVONNavigationComponent::FindPathAsync(const FVector& aStartPosition, cons
 		settings.myPathCostType = PathCostType;
 		settings.mySmoothingIterations = SmoothingIterations;
 
-		(new FAutoDeleteAsyncTask<FSVONFindPathTask>(*myCurrentNavVolume, settings, GetWorld(), startNavLink, targetNavLink, aStartPosition, aTargetPosition, oNavPath, aCompleteFlag  ))->StartBackgroundTask();
+		(new FAutoDeleteAsyncTask<FSVONFindPathTask>(*myCurrentNavVolume, settings, GetWorld(), startNavLink, targetNavLink, aStartPosition, aTargetPosition, *oNavPath, aCompleteFlag  ))->StartBackgroundTask();
 
 		return true;
 	}
@@ -198,7 +198,7 @@ bool USVONNavigationComponent::FindPathImmediate(const FVector& aStartPosition, 
 
 		SVONPathFinder pathFinder(GetWorld(), *myCurrentNavVolume, settings);
 
-		int result = pathFinder.FindPath(startNavLink, targetNavLink, aStartPosition, aTargetPosition, oNavPath);
+		int result = pathFinder.FindPath(startNavLink, targetNavLink, aStartPosition, aTargetPosition, *oNavPath);
 
 		path->SetIsReady(true);
 

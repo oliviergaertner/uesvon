@@ -5,7 +5,7 @@
 //#include "Runtime/NavigationSystem/Public/NavigationData.h"
 #include "SVONNavigationPath.h"
 
-int SVONPathFinder::FindPath(const SVONLink& aStart, const SVONLink& aGoal, const FVector& aStartPos, const FVector& aTargetPos, FSVONNavPathSharedPtr* oPath)
+int SVONPathFinder::FindPath(const SVONLink& aStart, const SVONLink& aGoal, const FVector& aStartPos, const FVector& aTargetPos, FSVONNavPathSharedPtr oPath)
 {
 	myOpenSet.Empty();
 	myClosedSet.Empty();
@@ -42,7 +42,7 @@ int SVONPathFinder::FindPath(const SVONLink& aStart, const SVONLink& aGoal, cons
 
 		if (myCurrent == myGoal)
 		{
-			BuildPath(myCameFrom, myCurrent, aStartPos, aTargetPos, oPath);
+			BuildPath(myCameFrom, myCurrent, aStartPos, aTargetPos, &oPath);
 #if WITH_EDITOR
 			UE_LOG(UESVON, Display, TEXT("Pathfinding complete, iterations : %i"), numIterations);
 #endif
@@ -161,14 +161,14 @@ void SVONPathFinder::ProcessLink(const SVONLink& aNeighbour)
 	}
 }
 
-void SVONPathFinder::BuildPath(TMap<SVONLink, SVONLink>& aCameFrom, SVONLink aCurrent, const FVector& aStartPos, const FVector& aTargetPos, FSVONNavPathSharedPtr* oPath)
+void SVONPathFinder::BuildPath(TMap<SVONLink, SVONLink>& aCameFrom, SVONLink aCurrent, const FVector& aStartPos, const FVector& aTargetPos, FSVONNavPathSharedPtr oPath)
 {
 	
 	FSVONPathPoint pos;
 
 	TArray<FSVONPathPoint> points;
 
-	if (!oPath || !oPath->IsValid())
+	if (!oPath.IsValid())
 		return;
 
 	while (aCameFrom.Contains(aCurrent) && !(aCurrent == aCameFrom[aCurrent]))
@@ -211,7 +211,7 @@ void SVONPathFinder::BuildPath(TMap<SVONLink, SVONLink>& aCameFrom, SVONLink aCu
 
 	for (int i = points.Num() - 1; i >= 0; i--)
 	{
-		oPath->Get()->GetPathPoints().Add(points[i]);
+		oPath->GetPathPoints().Add(points[i]);
 	}
 	
 	

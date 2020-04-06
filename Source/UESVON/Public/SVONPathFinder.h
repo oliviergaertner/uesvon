@@ -2,6 +2,8 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "SVONTypes.h"
+#include "SVONNavigationPath.h"
+#include "SVONLink.h"
 
 
 struct FSVONNavigationPath;
@@ -44,7 +46,7 @@ public:
 	~SVONPathFinder() {};
 
 	/* Performs an A* search from start to target navlink */
-	int FindPath(const SVONLink& aStart, const SVONLink& aTarget, const FVector& aStartPos, const FVector& aTargetPos, FSVONNavPathSharedPtr* oPath);
+	int FindPath(const SVONLink& aStart, const SVONLink& aTarget, const FVector& aStartPos, const FVector& aTargetPos, FSVONNavPathSharedPtr oPath);
 
 
 private:
