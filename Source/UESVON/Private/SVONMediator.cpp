@@ -6,7 +6,7 @@
 #include "SVONLink.h"
 #include "DrawDebugHelpers.h"
 
-bool SVONMediator::GetLinkFromPosition(const FVector& aPosition, const ASVONVolume& aVolume, SVONLink& oLink)
+bool SVONMediator::GetLinkFromPosition(const FVector& aPosition, const ASVONVolume& aVolume, SVONLink& oLink, bool bIncludeBlocked)
 {
 	// Position is outside the volume, no can do
 	if (!aVolume.EncompassesPoint(aPosition))
@@ -86,7 +86,7 @@ bool SVONMediator::GetLinkFromPosition(const FVector& aPosition, const ASVONVolu
 
 					mortoncode_t leafIndex = morton3D_64_encode(coord.X, coord.Y, coord.Z); // This morton code is our key into the 64-bit leaf node
 
-					if (leaf.GetNode(leafIndex))
+					if (!bIncludeBlocked && leaf.GetNode(leafIndex))
 						return false;// This voxel is blocked, oops!
 
 					oLink.mySubnodeIndex = leafIndex;
