@@ -84,7 +84,7 @@ public:
 	bool IsReadyForNavigation();
 	
 	// Public const getters
-	const TArray<SVONNode>& GetLayer(layerindex_t aLayer) const { return myData.myLayers[aLayer]; };
+	const TArray<SVONNode>& GetLayer(layerindex_t aLayer) const { return myData->myLayers[aLayer]; };
 	const SVONNode& GetNode(const SVONLink& aLink) const;
 	const SVONLeafNode& GetLeafNode(nodeindex_t aIndex) const;
 	
@@ -101,7 +101,7 @@ public:
 private:
 
 	// The navigation data
-	SVONData myData;
+	TSharedRef<SVONData, ESPMode::ThreadSafe> myData;
 	// temporary data used during nav data generation first pass rasterize
 	TArray<TSet<mortoncode_t>> myBlockedIndices;
 	// Helper members
@@ -111,7 +111,7 @@ private:
 	FVector myDebugPosition;
 	bool myIsReadyForNavigation{ false };
 	
-	TArray<SVONNode>& GetLayer(layerindex_t aLayer) { return myData.myLayers[aLayer]; };
+	TArray<SVONNode>& GetLayer(layerindex_t aLayer) { return myData->myLayers[aLayer]; };
 
 	void UpdateBounds();
 

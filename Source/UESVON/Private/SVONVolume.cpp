@@ -12,6 +12,7 @@ using namespace std::chrono;
 
 ASVONVolume::ASVONVolume(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
+	, myData(MakeShared<SVONData, ESPMode::ThreadSafe>())
 	, myDebugPosition(FVector())
 	
 {
@@ -76,7 +77,7 @@ bool ASVONVolume::Generate()
 
 	// Clear data (for now)
 	myBlockedIndices.Empty();
-	myData.myLayers.Empty();
+	myData->myLayers.Empty();
 
 	myNumLayers = myVoxelPower + 1;
 
@@ -84,13 +85,13 @@ bool ASVONVolume::Generate()
 	FirstPassRasterize();
 
 	// Allocate the leaf node data
-	myData.myLeafNodes.Empty();
-	myData.myLeafNodes.AddDefaulted(myBlockedIndices[0].Num() * 8 * 0.25f);
+	myData->myLeafNodes.Empty();
+	myData->myLeafNodes.AddDefaulted(myBlockedIndices[0].Num() * 8 * 0.25f);
 
 	// Add layers
 	for (int i = 0; i < myNumLayers; i++)
 	{
-		myData.myLayers.Emplace();
+		myData->myLayers.Emplace();
 	}
 
 	// Rasterize layer, bottom up, adding parent/child links
@@ -115,20 +116,20 @@ bool ASVONVolume::Generate()
 
 	for (int i = 0; i < myNumLayers; i++)
 	{
-		totalNodes += myData.myLayers[i].Num();
+		totalNodes += myData->myLayers[i].Num();
 	}
 
 	int32 totalBytes = sizeof(SVONNode) * totalNodes;
-	totalBytes += sizeof(SVONLeafNode) * myData.myLeafNodes.Num();
+	totalBytes += sizeof(SVONLeafNode) * myData->myLeafNodes.Num();
 
 	UE_LOG(UESVON, Display, TEXT("Generation Time : %d"), buildTime);
 	UE_LOG(UESVON, Display, TEXT("Total Layers-Nodes : %d-%d"), myNumLayers, totalNodes);
-	UE_LOG(UESVON, Display, TEXT("Total Leaf Nodes : %d"), myData.myLeafNodes.Num());
+	UE_LOG(UESVON, Display, TEXT("Total Leaf Nodes : %d"), myData->myLeafNodes.Num());
 	UE_LOG(UESVON, Display, TEXT("Total Size (bytes): %d"), totalBytes);
 
 #endif
 
-	myNumBytes = myData.GetSize();
+	myNumBytes = myData->GetSize();
 
 	return true;
 }
@@ -143,7 +144,7 @@ void ASVONVolume::UpdateBounds()
 
 void ASVONVolume::ClearData()
 {
-	myData.Reset();
+	myData = MakeShared<SVONData, ESPMode::ThreadSafe>();
 	myNumLayers = 0;
 	myNumBytes = 0;
 }
@@ -244,7 +245,7 @@ const SVONNode& ASVONVolume::GetNode(const SVONLink& aLink) const
 
 const SVONLeafNode& ASVONVolume::GetLeafNode(nodeindex_t aIndex) const
 {
-	return myData.myLeafNodes[aIndex];
+	return myData->myLeafNodes[aIndex];
 }
 
 void ASVONVolume::GetLeafNeighbours(const SVONLink& aLink, TArray<SVONLink>& oNeighbours) const
@@ -418,10 +419,10 @@ void ASVONVolume::Serialize(FArchive& Ar)
 
 	if (myGenerationStrategy == ESVOGenerationStrategy::UseBaked)
 	{
-		Ar << myData;
+		Ar << (*myData);
 
-		myNumLayers = myData.myLayers.Num();
-		myNumBytes = myData.GetSize();
+		myNumLayers = myData->myLayers.Num();
+		myNumBytes = myData->GetSize();
 	}
 }
 
@@ -498,7 +499,7 @@ void ASVONVolume::BuildNeighbourLinks(layerindex_t aLayer)
 			backtrackIndex = index;
 
 			while (!FindLinkInDirection(searchLayer, index, d, linkToUpdate, nodePos)
-				&& aLayer < myData.myLayers.Num() - 2)
+				&& aLayer < myData->myLayers.Num() - 2)
 			{
 				SVONLink& parent = GetLayer(searchLayer)[index].myParent;
 				if (parent.IsValid())
@@ -604,12 +605,12 @@ void ASVONVolume::RasterizeLeafNode(FVector& aOrigin, nodeindex_t aLeafIndex)
 		float leafVoxelSize = GetVoxelSize(0) * 0.25f;
 		FVector position = aOrigin + FVector(x * leafVoxelSize, y * leafVoxelSize, z * leafVoxelSize) + FVector(leafVoxelSize * 0.5f);
 
-		if (aLeafIndex >= myData.myLeafNodes.Num() - 1)
-			myData.myLeafNodes.AddDefaulted(1);
+		if (aLeafIndex >= myData->myLeafNodes.Num() - 1)
+			myData->myLeafNodes.AddDefaulted(1);
 
 		if(IsBlocked(position, leafVoxelSize * 0.5f))
 		{
-			myData.myLeafNodes[aLeafIndex].SetNode(i);
+			myData->myLeafNodes[aLeafIndex].SetNode(i);
 
 			if (myShowLeafVoxels && IsInDebugRange(position)) {
 				DrawDebugBox(GetWorld(), position, FVector(leafVoxelSize * 0.5f), FQuat::Identity, FColor::Red, true, -1.f, 0, .0f);
@@ -709,7 +710,7 @@ void ASVONVolume::RasterizeLayer(layerindex_t aLayer)
 				}
 				else
 				{
-					myData.myLeafNodes.AddDefaulted(1);
+					myData->myLeafNodes.AddDefaulted(1);
 					leafIndex++;
 					node.myFirstChild.SetInvalid();
 				}

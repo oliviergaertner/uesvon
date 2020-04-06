@@ -79,7 +79,7 @@ private:
 	void ProcessLink(const SVONLink& aNeighbour);
 
 	/* Constructs the path by navigating back through our CameFrom map */
-	void BuildPath(TMap<SVONLink, SVONLink>& aCameFrom, SVONLink aCurrent, const FVector& aStartPos, const FVector& aTargetPos, FSVONNavPathSharedPtr* oPath);
+	void BuildPath(TMap<SVONLink, SVONLink>& aCameFrom, SVONLink aCurrent, const FVector& aStartPos, const FVector& aTargetPos, FSVONNavPathSharedPtr oPath);
 
 	/*void Smooth_Chaikin(TArray<FVector>& somePoints, int aNumIterations);*/
 

@@ -42,7 +42,7 @@ int SVONPathFinder::FindPath(const SVONLink& aStart, const SVONLink& aGoal, cons
 
 		if (myCurrent == myGoal)
 		{
-			BuildPath(myCameFrom, myCurrent, aStartPos, aTargetPos, &oPath);
+			BuildPath(myCameFrom, myCurrent, aStartPos, aTargetPos, oPath);
 #if WITH_EDITOR
 			UE_LOG(UESVON, Display, TEXT("Pathfinding complete, iterations : %i"), numIterations);
 #endif
